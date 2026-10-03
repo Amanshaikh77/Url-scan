@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Scan | Form Ready India</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% -20%, #1e1b4b 0%, #090d16 65%, #05070c 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 30px 18px 48px;
+        }
+        .container { width: 100%; max-width: 520px; }
+        .brand-wrapper { display: flex; justify-content: center; margin-bottom: 20px; }
+        .brand-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 9999px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            font-size: 12px; font-weight: 700; letter-spacing: 0.8px;
+            text-transform: uppercase; color: #e2e8f0;
+        }
+        .brand-dot { width: 7px; height: 7px; background: #38bdf8; border-radius: 50%; box-shadow: 0 0 10px #38bdf8; }
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 {
+            font-size: 30px; font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 40%, #38bdf8 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .header p { color: #94a3b8; font-size: 13px; margin-top: 4px; }
+        .search-box {
+            background: rgba(22, 29, 45, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px; padding: 6px; display: flex; gap: 8px;
+            margin-bottom: 20px;
+        }
+        .search-box:focus-within { border-color: #38bdf8; }
+        .search-box input {
+            flex: 1; background: transparent; border: none; padding: 10px 14px;
+            color: #fff; font-size: 14.5px; outline: none; font-family: inherit;
+        }
+        .search-box button {
+            background: #0284c7; color: white; border: none; padding: 10px 20px;
+            border-radius: 10px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .search-box button:disabled { background: #334155; cursor: not-allowed; }
+
+        /* Loader */
+        #loadingState {
+            display: none;
+            background: rgba(17, 24, 39, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 18px;
+            padding: 24px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .spinner {
+            width: 42px; height: 42px;
+            border: 3.5px solid rgba(56, 189, 248, 0.15);
+            border-top: 3.5px solid #38bdf8;
+            border-radius: 50%;
+            margin: 0 auto 12px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-title { font-size: 15px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; }
+        .loading-step { font-size: 12.5px; color: #38bdf8; font-weight: 500; }
+
+        /* Card */
+        .card {
+            background: rgba(17, 24, 39, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 18px; padding: 22px;
+            backdrop-filter: blur(20px);
+        }
+        .status-pill {
+            display: inline-block; padding: 6px 14px; border-radius: 8px;
+            font-size: 13px; font-weight: 700; margin-bottom: 18px;
+        }
+        .badge-gov { background: rgba(22, 101, 52, 0.35); border: 1px solid #16a34a; color: #86efac; }
+        .badge-safe { background: rgba(7, 89, 133, 0.35); border: 1px solid #0284c7; color: #7dd3fc; }
+        .badge-warn { background: rgba(133, 77, 14, 0.35); border: 1px solid #ca8a04; color: #fde047; }
+        .badge-gambling { background: rgba(168, 85, 247, 0.25); border: 1px solid #a855f7; color: #d8b4fe; }
+        .badge-danger { background: rgba(153, 27, 27, 0.4); border: 1px solid #dc2626; color: #fca5a5; }
+        
+        .section-title {
+            font-size: 11px; font-weight: 700; color: #38bdf8;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            margin: 14px 0 8px;
+        }
+        .info-list { display: flex; flex-direction: column; gap: 10px; }
+        .info-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding-bottom: 9px; border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+        .info-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .info-label { color: #94a3b8; }
+        .info-value { color: #f8fafc; font-weight: 600; text-align: right; max-width: 65%; word-break: break-all; }
+        
+        .ai-box {
+            margin-top: 14px;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(168, 85, 247, 0.08) 100%);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 12px;
+            padding: 12px;
+        }
+        .ai-title {
+            font-size: 11px; font-weight: 800; color: #c084fc;
+            text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 4px;
+        }
+        .ai-summary { font-size: 13px; color: #e2e8f0; line-height: 1.4; }
+
+        .signals {
+            margin-top: 16px; padding: 12px; background: rgba(15, 23, 42, 0.6);
+            border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .signals ul { list-style: square; margin-left: 18px; font-size: 12.5px; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="brand-wrapper">
+            <div class="brand-badge"><span class="brand-dot"></span>Form Ready India</div>
+        </div>
+
+        <div class="header">
+            <h1>URL Scan</h1>
+            <p>AI Powered Fraud, Gambling & Security Inspector</p>
+        </div>
+
+        <form method="POST" class="search-box" id="scanForm" onsubmit="showLoading()">
+            <input type="text" name="url" id="urlInput" 
+                   value="{{ data.url if data else '' }}" 
+                   placeholder="Paste link (e.g. sbi, gambling, gov link)..." required autocomplete="off">
+            <button type="submit" id="scanBtn">Scan</button>
+        </form>
+
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <div class="loading-title">Scanning Target Link...</div>
+            <div class="loading-step" id="stepText">Checking DNS & IP records...</div>
+        </div>
+
+        {% if data %}
+        <div class="card" id="resultCard">
+            {% if data.verdict == 'Verified Government Site' %}
+                <div class="status-pill badge-gov">✓ {{ data.verdict }}</div>
+            {% elif data.verdict == 'Gambling / Real-Money Betting Site' %}
+                <div class="status-pill badge-gambling">♠ {{ data.verdict }}</div>
+            {% elif data.verdict == 'Standard / Likely Safe' %}
+                <div class="status-pill badge-safe">✓ {{ data.verdict }}</div>
+            {% elif data.verdict == 'Suspicious / Review Required' %}
+                <div class="status-pill badge-warn">⚠ {{ data.verdict }}</div>
+            {% else %}
+                <div class="status-pill badge-danger">✕ {{ data.verdict }}</div>
+            {% endif %}
+
+            <div class="ai-box">
+                <div class="ai-title">✦ AI Classification: {{ data.ai_category }}</div>
+                <div class="ai-summary">{{ data.ai_summary }}</div>
+            </div>
+
+            <div class="section-title">Identity & Origin</div>
+            <div class="info-list">
+                <div class="info-item">
+                    <span class="info-label">Title</span>
+                    <span class="info-value">{{ data.page_title }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Domain</span>
+                    <span class="info-value">{{ data.domain }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Server Location</span>
+                    <span class="info-value">{{ data.country }} ({{ data.ip_address }})</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ISP / Hosting</span>
+                    <span class="info-value">{{ data.isp }}</span>
+                </div>
+            </div>
+
+            <div class="section-title">Security & Compliance</div>
+            <div class="info-list">
+                <div class="info-item">
+                    <span class="info-label">Gov Entity</span>
+                    <span class="info-value" style="color: {{ '#4ade80' if data.is_gov else '#94a3b8' }};">
+                        {{ "Verified Official" if data.is_gov else "No" }}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Gambling / Betting</span>
+                    <span class="info-value" style="color: {{ '#c084fc' if data.is_gambling else '#94a3b8' }};">
+                        {{ "Detected" if data.is_gambling else "Not Detected" }}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Live Threat Database</span>
+                    <span class="info-value" style="color: {{ '#f87171' if 'Malicious' in data.threat_intel else '#4ade80' }};">
+                        {{ data.threat_intel }}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">SSL Security</span>
+                    <span class="info-value" style="color: {{ '#4ade80' if data.ssl_secure else '#f87171' }};">
+                        {{ "HTTPS Valid" if data.ssl_secure else "Insecure (HTTP)" }}
+                    </span>
+                </div>
+            </div>
+
+            {% if data.reasons %}
+            <div class="signals">
+                <div style="font-size: 11px; font-weight:700; color:#94a3b8; margin-bottom:6px; text-transform:uppercase;">Observed Flags</div>
+                <ul>
+                    {% for reason in data.reasons %}
+                    <li>{{ reason }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        function showLoading() {
+            const input = document.getElementById('urlInput').value.trim();
+            if(!input) return;
+
+            const oldCard = document.getElementById('resultCard');
+            if (oldCard) oldCard.style.display = 'none';
+
+            const loader = document.getElementById('loadingState');
+            const btn = document.getElementById('scanBtn');
+            const stepText = document.getElementById('stepText');
+
+            loader.style.display = 'block';
+            btn.disabled = true;
+            btn.innerText = 'Scanning...';
+
+            const steps = [
+                "Connecting to target host...",
+                "Resolving IP & Geolocation records...",
+                "Querying Global Threat Feeds...",
+                "Running AI Pattern & Content Inspector..."
+            ];
+            let i = 0;
+            setInterval(() => {
+                if (i < steps.length) {
+                    stepText.innerText = steps[i];
+                    i++;
+                }
+            }, 750);
+        }
+    </script>
+</body>
+</html>
